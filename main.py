@@ -70,7 +70,7 @@ def ask_for_weather(chat):
             pressure = round(data["main"]["pressure"] * 0.75006375541921)  # перевод гПа в мм рт.ст.
 
             advice = ''
-            
+
             if temperature < 0:
                 advice = '\nОчень холодно, одевайтесь тепло!'
             elif temperature > 20:
@@ -93,4 +93,25 @@ def ask_for_weather(chat):
         except:
             bot.send_message(message.chat.id, 'Не понимаю, где здесь собака зарыта и при чем здесь волки сутулые.. Это что за город? мы вообще с одной планеты? напиши корректно, полное название, иначе ни я, ни офтальмолог тебе помочь не сможем :(')
 
+
+@bot.callback_query_handler(func=lambda call: call.data == 'menu')
+def handle_menu_button(query):
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton('Узнать погоду', callback_data='weather')
+    btn2 = types.InlineKeyboardButton('Посмотреть на капибару', callback_data="capibara")
+    markup.row(btn1, btn2)  # Using the add() method to add buttons in a single row
+    markup.add()
+    bot.send_message(query.message.chat.id, f'Привит, что тебе от меня надо? Получается, если ты вернулся в меню, то погода тебе больше не интересна?', reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == 'capibara')
+def handle_capi_button(query):
+    markup = types.InlineKeyboardMarkup()
+    btn3 = types.InlineKeyboardButton('Меню', callback_data='menu')
+    markup.row(btn3)
+    markup.add()
+    image = 'capi.png'
+    file = open('./' + image, 'rb')
+    bot.send_photo(query.message.chat.id, file, reply_markup=markup)
+
+    
 bot.polling(none_stop=True)
