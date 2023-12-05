@@ -47,5 +47,26 @@ def weather(message):
     file = open('./' + image, 'rb')
     bot.send_photo(message.chat.id, file, reply_markup=markup)
 
+@bot.callback_query_handler(func=lambda call: call.data == 'weather')
+def handle_weather_button(query):
+    ask_for_weather(query.message)
+def ask_for_weather(chat):
+    bot.send_message(chat.chat.id, 'Хорошо! Напиши свой город, чтобы я мог помочь тебе с погодой :)')
+
+    @bot.message_handler(func=lambda message: True)
+    def get_weather(message):
+        try:
+            markup = types.InlineKeyboardMarkup()
+            btn3 = types.InlineKeyboardButton('Меню', callback_data='menu')
+            markup.row(btn3)
+            markup.add()
+            city = message.text.strip().lower()
+            res = requests.get(f'http://api.openweathermap.org/data/2.5/weather?q={city}&lang=ru&units=metric&appid={api}')
+            data = json.loads(res.text)
+            weather_desc = data["weather"][0]["description"]
+            temperature = data["main"]["temp"]
+            wind_speed = data["wind"]["speed"]
+            humidity = data["main"]["humidity"]
+            pressure = round(data["main"]["pressure"] * 0.75006375541921)  # перевод гПа в мм рт.ст.
 
 bot.polling(none_stop=True)
