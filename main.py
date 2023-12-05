@@ -47,4 +47,5 @@ def weather(message):
     file = open('./' + image, 'rb')
     bot.send_photo(message.chat.id, file, reply_markup=markup)
 
+
 bot.polling(none_stop=True)
